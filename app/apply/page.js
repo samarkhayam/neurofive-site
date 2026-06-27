@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import PageHeader from '@/components/PageHeader'
@@ -14,6 +14,14 @@ const PERKS = [
 ]
 
 export default function Apply() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-brand-bg" />}>
+      <ApplyForm />
+    </Suspense>
+  )
+}
+
+function ApplyForm() {
   const searchParams = useSearchParams()
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState({

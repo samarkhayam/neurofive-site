@@ -53,7 +53,7 @@ export default function RootLayout({ children }) {
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
       </head>
-      <body className="flex min-h-screen flex-col bg-brand-bg font-sans text-brand-text antialiased">
+      <body suppressHydrationWarning  className="flex min-h-screen flex-col bg-brand-bg font-sans text-brand-text antialiased">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

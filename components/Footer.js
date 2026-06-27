@@ -1,12 +1,12 @@
 import Link from 'next/link'
 
 const NAV = [
-  { href: '/about', label: 'About' },
-  { href: '/tracks', label: 'Tracks' },
-  { href: '/apply', label: 'Apply' },
-  { href: '/get-certificate', label: 'Certificate' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/about', label: 'About', icon: 'fa-regular fa-address-card' },
+  { href: '/tracks', label: 'Tracks', icon: 'fa-solid fa-code-branch' },
+  { href: '/get-certificate', label: 'Get Certificate', icon: 'fa-solid fa-certificate' },
+  { href: '/verify-certificate', label: 'Verify', icon: 'fa-regular fa-circle-check' },
+  { href: '/faq', label: 'FAQ', icon: 'fa-regular fa-circle-question' },
+  { href: '/contact', label: 'Contact', icon: 'fa-regular fa-envelope' },
 ]
 
 export default function Footer() {
@@ -32,7 +32,8 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {NAV.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="transition-colors hover:text-brand-accent">
+                  <Link href={l.href} className="flex items-center gap-2 transition-colors hover:text-brand-accent">
+                    <i className={l.icon} aria-hidden="true"></i>
                     {l.label}
                   </Link>
                 </li>
@@ -41,7 +42,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-brand-text">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider brand-text">
               Connect
             </h3>
             <div className="flex gap-4 text-lg">
@@ -67,7 +68,7 @@ export default function Footer() {
                 href="https://www.instagram.com/neurofive_solutions1?igsh=Z25ldTVwazJrdnNv"
                 target="_blank"
                 rel="noreferrer"
-                aria-label="X"
+                aria-label="Instagram"
                 className="transition-colors hover:text-brand-accent"
               >
                 <i className="fa-brands fa-instagram" aria-hidden="true"></i>

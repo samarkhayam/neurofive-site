@@ -10,8 +10,8 @@ export const metadata = {
 
 const CHANNELS = [
   { icon: 'fa-solid fa-envelope', label: 'Email', value: 'team@neurofive.dev', href: 'mailto:team@neurofive.dev' },
-  { icon: 'fa-brands fa-facebook', label: 'Facebook', value: 'facebook.com/neurofive', href: 'https://facebook.com' },
-  { icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn', value: 'linkedin.com/company/neurofive', href: 'https://linkedin.com' },
+  { icon: 'fa-brands fa-facebook', label: 'Facebook', value: 'facebook.com/neurofive', href: 'https://www.facebook.com/profile.php?id=61591236217927' },
+  { icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn', value: 'linkedin.com/company/neurofive', href: 'https://www.linkedin.com/company/neurofivesolutions' },
 ]
 
 export default function Contact() {

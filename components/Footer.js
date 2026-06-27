@@ -55,7 +55,7 @@ export default function Footer() {
                 <i className="fa-brands fa-facebook" aria-hidden="true"></i>
               </a>
               <a
-                href="linkedin.com/company/neurofivesolutions"
+                href="https://www.linkedin.com/company/neurofivesolutions"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="LinkedIn"

@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-bg: var(--bg-main);
+  --color-brand-surface: var(--bg-surface);
+  --color-brand-card: var(--bg-card);
+  --color-brand-text: var(--text-primary);
+  --color-brand-muted: var(--text-secondary);
+  --color-brand-accent: var(--color-accent);
+  --color-brand-gold: var(--color-highlight);
+  --color-brand-border: var(--border-muted);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ===== Default Theme: Dark Green ===== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-main: #000000;
+  --bg-surface: #121216;
+  --bg-card: #18181f;
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --color-accent: #00ff66;
+  --color-highlight: #66ff99;
+  --border-muted: #003314;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+nav,
+footer,
+section,
+header,
+input,
+select,
+textarea,
+button,
+a {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.bg-grid {
+  background-image: linear-gradient(to right, var(--border-muted) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border-muted) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 75%);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.2s ease both;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

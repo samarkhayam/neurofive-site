@@ -1,23 +1,21 @@
 {
-  "name": "neurofive",
+  "name": "neurofive-next",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 --hostname 192.168.1.143",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "start": "next start"
   },
   "dependencies": {
-    "next": "16.2.9",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "@supabase/supabase-js": "^2.108.2",
+    "next": "15.3.3",
+    "react": "^19",
+    "react-dom": "^19"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4"
+    "@tailwindcss/postcss": "^4.2.0",
+    "postcss": "^8",
+    "tailwindcss": "^4.2.0"
   }
 }

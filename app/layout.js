@@ -52,7 +52,7 @@ export const metadata = {
     canonical: "https://neurofivesolutions.site",
   },
   verification: {
-    google: '<meta name="google-site-verification" content="frqgkQEWBtBri7OEe97KYuPAOZW07D8gWcDrGIDBFqk" />', // just the content value, not the whole tag
+    google: 'frqgkQEWBtBri7OEe97KYuPAOZW07D8gWcDrGIDBFqk', // just the content value, not the whole tag
   },
   
 };

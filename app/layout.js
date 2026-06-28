@@ -4,36 +4,54 @@ import Footer from '@/components/Footer'
 import SessionWrapper from '@/components/SessionWrapper'
 
 export const metadata = {
-  metadataBase: new URL('https://neurofivesolutions.com'),
+  metadataBase: new URL("https://neurofivesolutions.site"),
   title: {
-    default: 'NeuroFive Solutions — Build the stack, ship to real users',
-    template: '%s | NeuroFive Solutions',
+    default: "NeuroFive Solutions — Build the stack, ship to real users",
+    template: "%s | NeuroFive Solutions",
   },
   description:
-    'NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.',
-  keywords: ['internship', 'web development', 'builder cohort', 'React', 'Next.js', 'Supabase', 'tech internship'],
+    "NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.",
+  keywords: [
+    "internship",
+    "web development",
+    "builder cohort",
+    "React",
+    "Next.js",
+    "Supabase",
+    "tech internship",
+  ],
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    siteName: 'NeuroFive Solutions',
-    title: 'NeuroFive Solutions — Build the stack, ship to real users',
+    type: "website",
+    locale: "en_US",
+    siteName: "NeuroFive Solutions",
+    title: "NeuroFive Solutions — Build the stack, ship to real users",
     description:
-      'NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.',
-    images: [{ url: '/NFS.png', width: 1200, height: 630, alt: 'NeuroFive Solutions' }],
+      "NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.",
+    images: [
+      { url: "/NFS.png", width: 1200, height: 630, alt: "NeuroFive Solutions" },
+    ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'NeuroFive Solutions — Build the stack, ship to real users',
+    card: "summary_large_image",
+    title: "NeuroFive Solutions — Build the stack, ship to real users",
     description:
-      'NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.',
-    images: ['/NFS.png'],
+      "NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.",
+    images: ["/NFS.png"],
   },
   robots: {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true },
   },
-}
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
+  alternates: {
+    canonical: "https://neurofivesolutions.site",
+  },
+};
 
 export default function RootLayout({ children }) {
   return (

@@ -143,7 +143,7 @@ export default function Home() {
           </div>
 
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {TRACKS.slice(0, 2).map((job) => (
+            {TRACKS.slice(2, 4).map((job) => (
               <div
                 key={job.id}
                 className="flex flex-col justify-between rounded-2xl border border-brand-border bg-brand-card p-6 transition-colors hover:border-brand-accent/40"

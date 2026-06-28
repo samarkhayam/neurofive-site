@@ -1,6 +1,7 @@
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import SessionWrapper from '@/components/SessionWrapper'
 
 export const metadata = {
   metadataBase: new URL('https://neurofivesolutions.com'),
@@ -53,10 +54,12 @@ export default function RootLayout({ children }) {
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
       </head>
-      <body suppressHydrationWarning  className="flex min-h-screen flex-col bg-brand-bg font-sans text-brand-text antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body suppressHydrationWarning className="flex min-h-screen flex-col bg-brand-bg font-sans text-brand-text antialiased">
+        <SessionWrapper>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </SessionWrapper>
       </body>
     </html>
   )

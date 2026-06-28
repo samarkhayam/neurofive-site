@@ -28,7 +28,7 @@ export const metadata = {
     description:
       "NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.",
     images: [
-      { url: "/NFS.png", width: 1200, height: 630, alt: "NeuroFive Solutions" },
+      { url: "/og-image.png", width: 1200, height: 630, alt: "NeuroFive Solutions" },
     ],
   },
   twitter: {
@@ -36,7 +36,7 @@ export const metadata = {
     title: "NeuroFive Solutions — Build the stack, ship to real users",
     description:
       "NeuroFive is an elite builder ecosystem. Claim an active development track, ship features to real users, and grow into a core engineering role.",
-    images: ["/NFS.png"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,

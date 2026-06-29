@@ -2,20 +2,20 @@
 
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
 
-// Register fonts
+// Register fonts with working URLs
 Font.register({
   family: 'Inter',
   fonts: [
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.ttf' },
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.ttf', fontWeight: 600 },
-    { src: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuBWYAZ9hiA.ttf', fontWeight: 700 },
+    { src: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek.ttf' },
+    { src: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiJ-Ek.ttf', fontWeight: 600 },
+    { src: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuBWYAZ9hiJ-Ek.ttf', fontWeight: 700 },
   ]
 })
 
 Font.register({
   family: 'SpaceGrotesk',
   fonts: [
-    { src: 'https://fonts.gstatic.com/s/spacegrotesk/v15/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXsrPMBZ.woff2', fontWeight: 700 },
+    { src: 'https://fonts.gstatic.com/s/spacegrotesk/v21/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXsrPMBZ.ttf', fontWeight: 700 },
   ]
 })
 
@@ -45,14 +45,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     opacity: 0.3,
   },
-  grid: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    opacity: 0.05,
-  },
   content: {
     flex: 1,
     justifyContent: 'center',
@@ -63,8 +55,6 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   logo: {
-    width: 80,
-    height: 80,
     marginBottom: 10,
   },
   title: {

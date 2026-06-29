@@ -274,7 +274,7 @@ export default function CertificatePage() {
             {internees.map((i) => (
               <Link
                 key={i.id}
-                href={`/certificate?cohort=${i.id}`}
+                href={`/dashboard/certificate?cohort=${i.id}`}
                 className={`rounded-lg border px-4 py-2 text-sm transition-colors ${
                   i.id === selectedInternee.id
                     ? 'border-brand-accent bg-brand-accent/10 text-brand-accent'

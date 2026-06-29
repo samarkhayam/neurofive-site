@@ -5,16 +5,20 @@ import Link from 'next/link'
 
 export const metadata = { title: 'Certificate' }
 
-export default async function CertificatePage() {
+export default async function CertificatePage({ searchParams }) {
   const session = await auth()
   if (!session) redirect('/login')
 
-  const { data: internee } = await supabase
+  const { cohort: cohortParam } = await searchParams
+
+  const { data: internees } = await supabase
     .from('internees')
     .select('id, full_name, field, cohort_id, cert_id, start_date, end_date, grade, cert_paid')
     .eq('email', session.user.email)
-    .single()
+    .order('created_at', { ascending: false })
 
+  if (!internees || internees.length === 0) redirect('/dashboard')
+  const internee = internees.find((i) => i.id === cohortParam) || internees[0]
   if (!internee) redirect('/dashboard')
 
   const { data: taskRows } = await supabase

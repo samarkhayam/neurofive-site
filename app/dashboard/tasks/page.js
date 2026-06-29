@@ -21,16 +21,20 @@ function getUnlockedWeeks(startDate) {
   return Math.max(1, Math.floor(daysPassed / 7) + 1)
 }
 
-export default async function TasksPage() {
+export default async function TasksPage({ searchParams }) {
   const session = await auth()
   if (!session) redirect('/login')
 
-  const { data: internee } = await supabase
+  const { cohort: cohortParam } = await searchParams
+
+  const { data: internees } = await supabase
     .from('internees')
     .select('id, start_date')
     .eq('email', session.user.email)
-    .single()
+    .order('created_at', { ascending: false })
 
+  if (!internees || internees.length === 0) redirect('/dashboard')
+  const internee = internees.find((i) => i.id === cohortParam) || internees[0]
   if (!internee) redirect('/dashboard')
 
   const unlockedWeeks = getUnlockedWeeks(internee.start_date)
@@ -160,7 +164,7 @@ export default async function TasksPage() {
                     return (
                       <Link
                         key={row.id}
-                        href={`/dashboard/tasks/${row.id}`}
+                        href={`/dashboard/tasks/${row.id}?cohort=${internee.id}`}
                         className="group flex items-center justify-between rounded-xl border border-brand-border bg-brand-surface p-4 transition-colors hover:border-brand-accent"
                       >
                         <div className="min-w-0 flex-1">

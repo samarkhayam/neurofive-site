@@ -32,10 +32,7 @@ export default async function CertificatePage({ searchParams }) {
   const allApproved = total > 0 && approved === total && internee.cert_paid === true
   const progress = total > 0 ? Math.round((approved / total) * 100) : 0
 
-  // Certificate also requires internship end date to have passed
-  const endDate = internee.end_date ? new Date(internee.end_date) : null
-  const internshipEnded = endDate ? new Date() >= endDate : false
-  const certUnlocked = allApproved && internshipEnded
+  const certUnlocked = allApproved
 
   // Fetch cohort name
   let cohortName = null
@@ -48,7 +45,7 @@ export default async function CertificatePage({ searchParams }) {
     cohortName = cohort?.name
   }
 
-  if (!certUnlocked) {
+  if (!allApproved) {
     return (
       <div className="px-6 py-8 lg:px-10 pb-24 lg:pb-8">
         <div className="mb-8">

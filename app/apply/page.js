@@ -72,15 +72,24 @@ function ApplyForm() {
           }))
         })
 
-      // Check if user already has an approved application
+      // Check if user has an approved application in the CURRENT active cohort only
       supabase
-        .from('applications')
-        .select('id, field, status')
-        .eq('email', session.user.email)
-        .eq('status', 'approved')
+        .from('cohorts')
+        .select('id')
+        .eq('is_active', true)
         .maybeSingle()
-        .then(({ data }) => {
-          if (data) setApprovedApp(data)
+        .then(({ data: activeCohort }) => {
+          if (!activeCohort) return
+          supabase
+            .from('applications')
+            .select('id, field, status')
+            .eq('email', session.user.email)
+            .eq('status', 'approved')
+            .eq('cohort_id', activeCohort.id)
+            .maybeSingle()
+            .then(({ data }) => {
+              if (data) setApprovedApp(data)
+            })
         })
     }
   }, [status, session])
@@ -329,7 +338,8 @@ function ApplyForm() {
               <p className="mt-2 max-w-sm text-sm text-brand-muted">
                 Your application for{' '}
                 <span className="font-semibold text-brand-text">{approvedApp.field}</span> has been{' '}
-                <span className="text-brand-accent font-semibold">approved</span>. You cannot submit a new application.
+                <span className="text-brand-accent font-semibold">approved</span> in the current cohort.
+                You can apply again when a new cohort opens.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link

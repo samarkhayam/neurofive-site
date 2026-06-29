@@ -11,26 +11,32 @@ export default async function DashboardPage() {
 
   const { data: internee } = await supabase
     .from('internees')
-    .select('id, full_name, field, status, start_date, end_date, cohort_id')
+    .select('id, full_name, field, status, start_date, end_date, cohort_id, cert_paid')
     .eq('email', session.user.email)
     .single()
 
   if (!internee) redirect('/login')
 
-  // Fetch task stats
+  // Fetch task stats with week number
   const { data: taskRows } = await supabase
     .from('internee_tasks')
-    .select('status')
+    .select('status, tasks(week_number)')
     .eq('internee_id', internee.id)
+
+  // Calculate unlocked weeks
+  const startDate = internee.start_date ? new Date(internee.start_date) : new Date()
+  const weeksElapsed = Math.floor((new Date() - startDate) / (7 * 24 * 60 * 60 * 1000)) + 1
 
   const tasks = taskRows || []
   const total = tasks.length
+  const unlocked = tasks.filter((t) => (t.tasks?.week_number || 1) <= weeksElapsed)
   const approved = tasks.filter((t) => t.status === 'approved').length
-  const submitted = tasks.filter((t) => t.status === 'submitted').length
-  const pending = tasks.filter((t) => t.status === 'pending').length
-  const rejected = tasks.filter((t) => t.status === 'rejected').length
+  const submitted = unlocked.filter((t) => t.status === 'submitted').length
+  const pending = unlocked.filter((t) => t.status === 'pending').length
+  const rejected = unlocked.filter((t) => t.status === 'rejected').length
+  // Progress = approved out of total tasks (all weeks)
   const progress = total > 0 ? Math.round((approved / total) * 100) : 0
-  const allApproved = total > 0 && approved === total
+  const allApproved = total > 0 && approved === total && internee.cert_paid === true
 
   const stats = [
     { label: 'Total Tasks', value: total, icon: 'fa-solid fa-list-check', color: 'text-brand-muted' },
@@ -45,7 +51,7 @@ export default async function DashboardPage() {
       <div className="mb-8">
         <p className="text-sm text-brand-muted">Welcome back</p>
         <h1 className="font-display text-3xl font-bold text-brand-text">
-          {internee.full_name || session.user.name} 👋
+          {session.user.full_name || session.user.name} 👋
         </h1>
         <p className="mt-1 text-sm text-brand-muted">
           <span className="text-brand-accent font-medium">{internee.field}</span> track

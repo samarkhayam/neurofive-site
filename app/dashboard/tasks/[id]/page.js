@@ -22,7 +22,7 @@ export default async function TaskDetailPage({ params }) {
 
   const { data: internee } = await supabase
     .from('internees')
-    .select('id')
+    .select('id, start_date')
     .eq('email', session.user.email)
     .single()
 
@@ -52,7 +52,15 @@ export default async function TaskDetailPage({ params }) {
   if (!row) notFound()
 
   const cfg = STATUS_CONFIG[row.status] || STATUS_CONFIG.pending
-  const canSubmit = row.status === 'pending' || row.status === 'rejected'
+
+  // Check if this week is unlocked
+  const startDate = internee.start_date ? new Date(internee.start_date) : new Date()
+  const now = new Date()
+  const weeksElapsed = Math.floor((now - startDate) / (7 * 24 * 60 * 60 * 1000)) + 1
+  const weekNumber = row.tasks?.week_number || 1
+  const isLocked = weekNumber > weeksElapsed
+
+  const canSubmit = !isLocked && (row.status === 'pending' || row.status === 'rejected')
 
   return (
     <div className="px-6 py-8 lg:px-10 pb-24 lg:pb-8 max-w-2xl">
@@ -143,6 +151,33 @@ export default async function TaskDetailPage({ params }) {
           <i className="fa-solid fa-clock text-2xl text-blue-400 mb-2" aria-hidden="true" />
           <p className="font-semibold text-brand-text">Under Review</p>
           <p className="mt-1 text-xs text-brand-muted">Your submission is being reviewed. Check back soon.</p>
+        </div>
+      )}
+
+      {/* Locked week */}
+      {isLocked && (
+        <div className="mt-6 rounded-xl border border-brand-border bg-brand-surface p-5 text-center">
+          <i className="fa-solid fa-lock text-2xl text-brand-muted mb-2" aria-hidden="true" />
+          <p className="font-semibold text-brand-text">Task locked</p>
+          <p className="mt-1 text-xs text-brand-muted">
+            This task unlocks on week {weekNumber} of your internship
+            {internee.start_date && (() => {
+              const d = new Date(internee.start_date)
+              d.setDate(d.getDate() + (weekNumber - 1) * 7)
+              return ` (${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`
+            })()}
+          </p>
+        </div>
+      )}
+
+      {/* Week locked state */}
+      {weekLocked && (
+        <div className="mt-6 rounded-xl border border-brand-border bg-brand-surface p-5 text-center">
+          <i className="fa-solid fa-lock text-2xl text-brand-muted mb-2" aria-hidden="true" />
+          <p className="font-semibold text-brand-text">Task Locked</p>
+          <p className="mt-1 text-xs text-brand-muted">
+            This task unlocks in week {row.tasks?.week_number} of your internship.
+          </p>
         </div>
       )}
 

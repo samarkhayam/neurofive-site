@@ -11,7 +11,7 @@ export default async function CertificatePage() {
 
   const { data: internee } = await supabase
     .from('internees')
-    .select('id, full_name, field, cohort_id, cert_id, start_date, end_date, grade')
+    .select('id, full_name, field, cohort_id, cert_id, start_date, end_date, grade, cert_paid')
     .eq('email', session.user.email)
     .single()
 
@@ -25,8 +25,13 @@ export default async function CertificatePage() {
   const tasks = taskRows || []
   const total = tasks.length
   const approved = tasks.filter((t) => t.status === 'approved').length
-  const allApproved = total > 0 && approved === total
+  const allApproved = total > 0 && approved === total && internee.cert_paid === true
   const progress = total > 0 ? Math.round((approved / total) * 100) : 0
+
+  // Certificate also requires internship end date to have passed
+  const endDate = internee.end_date ? new Date(internee.end_date) : null
+  const internshipEnded = endDate ? new Date() >= endDate : false
+  const certUnlocked = allApproved && internshipEnded
 
   // Fetch cohort name
   let cohortName = null
@@ -39,7 +44,7 @@ export default async function CertificatePage() {
     cohortName = cohort?.name
   }
 
-  if (!allApproved) {
+  if (!certUnlocked) {
     return (
       <div className="px-6 py-8 lg:px-10 pb-24 lg:pb-8">
         <div className="mb-8">
@@ -55,7 +60,11 @@ export default async function CertificatePage() {
           </div>
           <h2 className="font-display text-xl font-bold text-brand-text">Not unlocked yet</h2>
           <p className="mt-2 text-sm text-brand-muted">
-            {approved} of {total} tasks approved. Get all tasks approved to generate your certificate.
+            {!allApproved
+              ? `${approved} of ${total} tasks approved. Complete all tasks first.`
+              : endDate
+              ? `All tasks approved! Certificate unlocks on ${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} when your internship ends.`
+              : 'Complete all tasks to unlock your certificate.'}
           </p>
 
           <div className="mt-6">

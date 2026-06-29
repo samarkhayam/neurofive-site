@@ -66,11 +66,9 @@ export default async function CertificatePage() {
             {approved === total && total > 0 ? 'Awaiting Issuance' : 'Not unlocked yet'}
           </h2>
           <p className="mt-2 text-sm text-brand-muted">
-            {!allApproved
-              ? `${approved} of ${total} tasks approved. Complete all tasks first.`
-              : endDate
-              ? `All tasks approved! Certificate unlocks on ${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} when your internship ends.`
-              : 'Complete all tasks to unlock your certificate.'}
+            {approved === total && total > 0
+              ? "All tasks completed. Your certificate is being processed — your cohort manager will issue it shortly."
+              : `${approved} of ${total} tasks approved. Get all tasks approved to unlock your certificate.`}
           </p>
 
           <div className="mt-6">

@@ -1,190 +1,292 @@
-import { auth } from '@/lib/auth'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { getInterneesByEmail, getTaskStats, getCohortById } from '@/lib/data'
-import { redirect } from 'next/navigation'
+import { DownloadCertificateButton } from '@/components/DownloadCertificateButton'
 import Link from 'next/link'
+import Image from 'next/image'
 
-export const metadata = { title: 'Certificate' }
+export default function CertificatePage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const cohortParam = searchParams.get('cohort')
 
-export default async function CertificatePage({ searchParams }) {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const [loading, setLoading] = useState(true)
+  const [internees, setInternees] = useState([])
+  const [selectedInternee, setSelectedInternee] = useState(null)
+  const [tasks, setTasks] = useState([])
+  const [error, setError] = useState('')
 
-  const { cohort: cohortParam } = await searchParams
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+      return
+    }
 
-  const internees = await getInterneesByEmail(session.user.email)
-  if (!internees || internees.length === 0) redirect('/dashboard')
-  const internee = internees.find((i) => i.id === cohortParam) || internees[0]
-  if (!internee) redirect('/dashboard')
-  // Fetch full internee data for cert-specific fields
-  const { data: interneeDetail } = await supabase
-    .from('internees')
-    .select('cert_id, grade, cert_paid, full_name, field, cohort_id, start_date, end_date')
-    .eq('id', internee.id)
-    .single()
-  Object.assign(internee, interneeDetail || {})
+    if (status === 'authenticated') {
+      fetchData()
+    }
+  }, [status, router, cohortParam])
 
-  const taskRows = await getTaskStats(internee.id)
-  const tasks = taskRows
-  const total = tasks.length
-  const approved = tasks.filter((t) => t.status === 'approved').length
-  const allApproved = total > 0 && approved === total && internee.cert_paid === true
-  const progress = total > 0 ? Math.round((approved / total) * 100) : 0
+  const fetchData = async () => {
+    setLoading(true)
+    setError('')
 
-  const certUnlocked = allApproved
+    try {
+      // 1. Get all internees for this user
+      const { data: interneesData, error: interneeError } = await supabase
+        .from('internees')
+        .select(`
+          id,
+          full_name,
+          field,
+          grade,
+          cert_id,
+          cert_paid,
+          internee_id,
+          start_date,
+          end_date,
+          status,
+          cohort_id,
+          cohorts (id, name)
+        `)
+        .eq('email', session.user.email)
+        .order('created_at', { ascending: false })
 
-  // Fetch cohort name
-  let cohortName = null
-  if (internee.cohort_id) {
-    const cohort = await getCohortById(internee.cohort_id)
-    cohortName = cohort?.name
+      if (interneeError) throw interneeError
+
+      setInternees(interneesData || [])
+
+      // 2. Select the right internee
+      let selected = null
+      if (cohortParam) {
+        selected = interneesData?.find(i => i.id === cohortParam) || null
+      }
+      if (!selected && interneesData?.length > 0) {
+        selected = interneesData[0]
+      }
+      setSelectedInternee(selected)
+
+      // 3. If selected, get tasks
+      if (selected) {
+        const { data: tasksData, error: tasksError } = await supabase
+          .from('internee_tasks')
+          .select('status')
+          .eq('internee_id', selected.id)
+
+        if (!tasksError) {
+          setTasks(tasksData || [])
+        }
+      }
+
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      setError('Failed to load certificate data')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  if (!allApproved) {
+  if (status === 'loading' || loading) {
     return (
-      <div className="px-6 py-8 lg:px-10 pb-24 lg:pb-8">
-        <div className="mb-8">
-          <h1 className="font-display text-2xl font-bold text-brand-text">Certificate</h1>
-          <p className="mt-1 text-sm text-brand-muted">
-            Complete all assigned tasks to unlock your certificate.
-          </p>
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+        <i className="fa-solid fa-spinner fa-spin text-2xl text-brand-accent" aria-hidden="true" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="px-6 py-8 lg:px-10 max-w-4xl mx-auto">
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
+          <i className="fa-solid fa-circle-xmark mr-2" aria-hidden="true" />
+          {error}
         </div>
+      </div>
+    )
+  }
 
-        <div className="max-w-md rounded-2xl border border-brand-border bg-brand-surface p-8 text-center">
-          <div className={`mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full text-3xl ${
-            approved === total && total > 0
-              ? 'bg-brand-accent/10 text-brand-accent'
-              : 'bg-brand-card text-brand-muted'
-          }`}>
-            <i className={`fa-solid ${approved === total && total > 0 ? 'fa-hourglass-half' : 'fa-lock'}`} aria-hidden="true" />
-          </div>
-          <h2 className="font-display text-xl font-bold text-brand-text">
-            {approved === total && total > 0 ? 'Awaiting Issuance' : 'Not unlocked yet'}
-          </h2>
-          <p className="mt-2 text-sm text-brand-muted">
-            {approved === total && total > 0
-              ? "All tasks completed. Your certificate is being processed — your cohort manager will issue it shortly."
-              : `${approved} of ${total} tasks approved. Get all tasks approved to unlock your certificate.`}
+  if (internees.length === 0) {
+    return (
+      <div className="px-6 py-8 lg:px-10 max-w-4xl mx-auto">
+        <div className="text-center py-12">
+          <i className="fa-solid fa-certificate text-5xl text-brand-muted/30 block mb-4" />
+          <h1 className="text-2xl font-bold text-brand-text">No Certificates Found</h1>
+          <p className="text-brand-muted mt-2">
+            You haven't completed any cohorts yet. Complete an internship to earn your certificate.
           </p>
-
-          <div className="mt-6">
-            <div className="mb-2 flex items-center justify-between text-xs text-brand-muted">
-              <span>Progress</span>
-              <span className="font-bold text-brand-accent">{progress}%</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-brand-card">
-              <div
-                className="h-full rounded-full bg-brand-accent transition-all duration-700"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-
           <Link
-            href="/dashboard/tasks"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-accent px-5 py-2.5 text-sm font-bold text-brand-bg transition-all hover:opacity-90"
+            href="/dashboard"
+            className="mt-6 inline-block rounded-lg bg-brand-accent px-5 py-2.5 text-sm font-bold text-brand-bg transition-all hover:opacity-90"
           >
-            <i className="fa-solid fa-list-check" aria-hidden="true" />
-            View Tasks
+            Go to Dashboard
           </Link>
         </div>
       </div>
     )
   }
 
-  // All tasks approved — show certificate details
+  if (!selectedInternee) {
+    return (
+      <div className="px-6 py-8 lg:px-10 max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-brand-text">Select a Cohort</h1>
+        <p className="text-brand-muted mt-1">Choose which certificate you want to view.</p>
+        <div className="mt-4 space-y-2">
+          {internees.map((i) => (
+            <Link
+              key={i.id}
+              href={`/certificate?cohort=${i.id}`}
+              className="block rounded-lg border border-brand-border bg-brand-surface p-4 hover:border-brand-accent transition-colors"
+            >
+              <p className="font-semibold text-brand-text">{i.cohorts?.name || 'Cohort'}</p>
+              <p className="text-sm text-brand-muted">{i.field}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  const total = tasks.length
+  const approved = tasks.filter(t => t.status === 'approved').length
+  const allApproved = total > 0 && approved === total
+  const progress = total > 0 ? Math.round((approved / total) * 100) : 0
+
   return (
-    <div className="px-6 py-8 lg:px-10 pb-24 lg:pb-8">
+    <div className="px-6 py-8 lg:px-10 max-w-4xl mx-auto pb-24 lg:pb-8">
+      {/* Header */}
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold text-brand-text">Certificate</h1>
         <p className="mt-1 text-sm text-brand-muted">
-          Congratulations — all tasks approved!
+          {selectedInterneo.cohorts?.name || 'Cohort'} — {selectedInternee.field}
         </p>
       </div>
 
-      {/* Celebration banner */}
-      <div className="mb-6 rounded-xl border border-brand-accent/30 bg-brand-accent/5 p-5">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-brand-accent/10 text-xl text-brand-accent">
-            <i className="fa-solid fa-trophy" aria-hidden="true" />
-          </div>
+      {/* Progress */}
+      <div className="mb-6 rounded-xl border border-brand-border bg-brand-surface p-5">
+        <div className="flex items-center justify-between">
           <div>
-            <p className="font-semibold text-brand-text">You&apos;ve completed the internship!</p>
-            <p className="text-sm text-brand-muted">
-              All {total} tasks approved — your certificate is ready.
+            <p className="text-sm text-brand-muted">Progress</p>
+            <p className="font-semibold text-brand-text">
+              {approved}/{total} tasks approved
             </p>
           </div>
+          <span className="text-lg font-bold text-brand-accent">{progress}%</span>
+        </div>
+        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-brand-card">
+          <div
+            className="h-full rounded-full bg-brand-accent transition-all duration-700"
+            style={{ width: `${progress}%` }}
+          />
         </div>
       </div>
 
-      {/* Certificate info card */}
-      <div className="mb-6 max-w-lg rounded-2xl border border-brand-border bg-brand-surface p-6">
-        <div className="mb-5 flex items-center gap-3">
-          <i className="fa-solid fa-certificate text-2xl text-brand-accent" aria-hidden="true" />
+      {/* Certificate Status */}
+      <div className="rounded-2xl border border-brand-border bg-brand-surface p-6 md:p-8">
+        {allApproved && selectedInternee.cert_paid ? (
+          // Unlocked
           <div>
-            <p className="font-display text-lg font-bold text-brand-text">Internship Certificate</p>
-            <p className="text-xs text-brand-muted">NeuroFive Solutions</p>
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent/10 text-2xl text-brand-accent">
+                <i className="fa-solid fa-certificate" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="font-display text-xl font-bold text-brand-text">Certificate Unlocked!</p>
+                <p className="text-sm text-brand-muted">All tasks completed. Download your certificate below.</p>
+              </div>
+            </div>
+
+            {/* Certificate preview card */}
+            <div className="mb-6 rounded-xl border border-brand-border bg-brand-card p-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-brand-accent/10">
+                  <Image src="/NFS.png" alt="NFS" width={40} height={40} />
+                </div>
+                <div>
+                  <p className="font-semibold text-brand-text">{selectedInternee.full_name}</p>
+                  <p className="text-sm text-brand-muted">{selectedInternee.field}</p>
+                  {selectedInternee.grade && (
+                    <p className="text-sm text-brand-accent">Grade: {selectedInternee.grade}</p>
+                  )}
+                  {selectedInternee.cert_id && (
+                    <p className="text-xs text-brand-muted font-mono">ID: {selectedInternee.cert_id}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Download button */}
+            <DownloadCertificateButton interneeId={selectedInternee.id}>
+              <i className="fa-solid fa-download mr-2" aria-hidden="true" />
+              Download Certificate (PDF)
+            </DownloadCertificateButton>
+
+            <p className="mt-3 text-xs text-brand-muted">
+              <i className="fa-solid fa-circle-info mr-1 text-brand-gold" aria-hidden="true" />
+              PDF will generate and download immediately.
+            </p>
+          </div>
+        ) : allApproved && !selectedInternee.cert_paid ? (
+          // Approved but not paid
+          <div className="text-center py-6">
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/10 text-3xl text-yellow-500">
+              <i className="fa-solid fa-hourglass-half" aria-hidden="true" />
+            </div>
+            <h2 className="font-display text-xl font-bold text-brand-text">Payment Required</h2>
+            <p className="mt-2 text-sm text-brand-muted max-w-md mx-auto">
+              All tasks are approved! Please complete the certificate fee payment to unlock your certificate.
+            </p>
+            <p className="mt-2 text-sm text-brand-muted">
+              Contact your cohort manager for payment details.
+            </p>
+          </div>
+        ) : (
+          // Locked
+          <div className="text-center py-6">
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-card text-3xl text-brand-muted">
+              <i className="fa-solid fa-lock" aria-hidden="true" />
+            </div>
+            <h2 className="font-display text-xl font-bold text-brand-text">Not Unlocked Yet</h2>
+            <p className="mt-2 text-sm text-brand-muted max-w-md mx-auto">
+              Complete all {total} tasks to unlock your certificate.
+              {` `}
+              <span className="text-brand-accent">{approved} of {total} tasks approved.</span>
+            </p>
+            <Link
+              href="/dashboard/tasks"
+              className="mt-6 inline-block rounded-lg bg-brand-accent px-5 py-2.5 text-sm font-bold text-brand-bg transition-all hover:opacity-90"
+            >
+              <i className="fa-solid fa-list-check mr-2" aria-hidden="true" />
+              View Tasks
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Switch cohort */}
+      {internees.length > 1 && (
+        <div className="mt-6">
+          <p className="text-sm text-brand-muted mb-2">Switch to another cohort:</p>
+          <div className="flex flex-wrap gap-2">
+            {internees.map((i) => (
+              <Link
+                key={i.id}
+                href={`/certificate?cohort=${i.id}`}
+                className={`rounded-lg border px-4 py-2 text-sm transition-colors ${
+                  i.id === selectedInternee.id
+                    ? 'border-brand-accent bg-brand-accent/10 text-brand-accent'
+                    : 'border-brand-border bg-brand-surface text-brand-muted hover:border-brand-accent'
+                }`}
+              >
+                {i.cohorts?.name || 'Cohort'}
+              </Link>
+            ))}
           </div>
         </div>
-
-        <dl className="space-y-3">
-          <div className="flex items-start justify-between gap-4">
-            <dt className="text-sm text-brand-muted">Name</dt>
-            <dd className="text-sm font-semibold text-brand-text text-right">{internee.full_name}</dd>
-          </div>
-          <div className="h-px bg-brand-border" />
-          <div className="flex items-start justify-between gap-4">
-            <dt className="text-sm text-brand-muted">Track</dt>
-            <dd className="text-sm font-semibold text-brand-text text-right">{internee.field}</dd>
-          </div>
-          {cohortName && (
-            <>
-              <div className="h-px bg-brand-border" />
-              <div className="flex items-start justify-between gap-4">
-                <dt className="text-sm text-brand-muted">Cohort</dt>
-                <dd className="text-sm font-semibold text-brand-text text-right">{cohortName}</dd>
-              </div>
-            </>
-          )}
-          {internee.grade && (
-            <>
-              <div className="h-px bg-brand-border" />
-              <div className="flex items-start justify-between gap-4">
-                <dt className="text-sm text-brand-muted">Grade</dt>
-                <dd className="text-sm font-semibold text-brand-accent text-right">{internee.grade}</dd>
-              </div>
-            </>
-          )}
-          {internee.cert_id && (
-            <>
-              <div className="h-px bg-brand-border" />
-              <div className="flex items-start justify-between gap-4">
-                <dt className="text-sm text-brand-muted">Certificate ID</dt>
-                <dd className="font-mono text-xs text-brand-muted text-right">{internee.cert_id}</dd>
-              </div>
-            </>
-          )}
-          {(internee.start_date || internee.end_date) && (
-            <>
-              <div className="h-px bg-brand-border" />
-              <div className="flex items-start justify-between gap-4">
-                <dt className="text-sm text-brand-muted">Period</dt>
-                <dd className="text-sm font-semibold text-brand-text text-right">
-                  {internee.start_date && new Date(internee.start_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                  {internee.start_date && internee.end_date && ' – '}
-                  {internee.end_date && new Date(internee.end_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                </dd>
-              </div>
-            </>
-          )}
-        </dl>
-      </div>
-
-      {/* Download / contact note */}
-      <div className="max-w-lg rounded-xl border border-brand-border bg-brand-card p-4 text-sm text-brand-muted">
-        <i className="fa-solid fa-circle-info mr-2 text-brand-gold" aria-hidden="true" />
-        Your certificate will be sent to your registered email. If you haven&apos;t received it within 48 hours, contact your cohort manager.
-      </div>
+      )}
     </div>
   )
 }

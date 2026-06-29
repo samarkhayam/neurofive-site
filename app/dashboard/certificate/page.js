@@ -55,10 +55,16 @@ export default async function CertificatePage() {
         </div>
 
         <div className="max-w-md rounded-2xl border border-brand-border bg-brand-surface p-8 text-center">
-          <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-card text-3xl text-brand-muted">
-            <i className="fa-solid fa-lock" aria-hidden="true" />
+          <div className={`mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full text-3xl ${
+            approved === total && total > 0
+              ? 'bg-brand-accent/10 text-brand-accent'
+              : 'bg-brand-card text-brand-muted'
+          }`}>
+            <i className={`fa-solid ${approved === total && total > 0 ? 'fa-hourglass-half' : 'fa-lock'}`} aria-hidden="true" />
           </div>
-          <h2 className="font-display text-xl font-bold text-brand-text">Not unlocked yet</h2>
+          <h2 className="font-display text-xl font-bold text-brand-text">
+            {approved === total && total > 0 ? 'Awaiting Issuance' : 'Not unlocked yet'}
+          </h2>
           <p className="mt-2 text-sm text-brand-muted">
             {!allApproved
               ? `${approved} of ${total} tasks approved. Complete all tasks first.`

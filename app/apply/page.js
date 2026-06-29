@@ -104,10 +104,10 @@ function ApplyForm() {
   }
 
   const handleChange = (e) => {
-    // Locked fields: fullName and email cannot be changed
-    if (e.target.name === 'fullName' || e.target.name === 'email') return
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+    // Only email is locked now — fullName is editable
+    if (e.target.name === "email") return;
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const insertApplication = async (cohortId) => {
     const { data: userData } = await supabase
@@ -236,17 +236,24 @@ function ApplyForm() {
       />
 
       {/* Duplicate popup */}
-      {popup === 'duplicate' && (
+      {popup === "duplicate" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="w-full max-w-md rounded-2xl border border-brand-border bg-brand-surface p-8 shadow-xl">
             <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400">
-              <i className="fa-solid fa-triangle-exclamation text-xl" aria-hidden="true" />
+              <i
+                className="fa-solid fa-triangle-exclamation text-xl"
+                aria-hidden="true"
+              />
             </div>
-            <h2 className="font-display text-lg font-bold text-brand-text">Already applied</h2>
+            <h2 className="font-display text-lg font-bold text-brand-text">
+              Already applied
+            </h2>
             <p className="mt-2 text-sm leading-relaxed text-brand-muted">
-              You&apos;ve already applied for{' '}
-              <span className="font-semibold text-brand-text">{formData.field}</span> in the current
-              cohort. Only one application per field is allowed.
+              You&apos;ve already applied for{" "}
+              <span className="font-semibold text-brand-text">
+                {formData.field}
+              </span>{" "}
+              in the current cohort. Only one application per field is allowed.
             </p>
             <button
               onClick={() => setPopup(null)}
@@ -259,18 +266,28 @@ function ApplyForm() {
       )}
 
       {/* Switch popup */}
-      {popup === 'switch' && existingApp && (
+      {popup === "switch" && existingApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="w-full max-w-md rounded-2xl border border-brand-border bg-brand-surface p-8 shadow-xl">
             <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent/10 text-brand-accent">
-              <i className="fa-solid fa-arrow-right-arrow-left text-xl" aria-hidden="true" />
+              <i
+                className="fa-solid fa-arrow-right-arrow-left text-xl"
+                aria-hidden="true"
+              />
             </div>
-            <h2 className="font-display text-lg font-bold text-brand-text">Switch your track?</h2>
+            <h2 className="font-display text-lg font-bold text-brand-text">
+              Switch your track?
+            </h2>
             <p className="mt-2 text-sm leading-relaxed text-brand-muted">
-              You already have an application for{' '}
-              <span className="font-semibold text-brand-text">{existingApp.field}</span>. Switching
-              will update your existing application to{' '}
-              <span className="font-semibold text-brand-text">{formData.field}</span>.
+              You already have an application for{" "}
+              <span className="font-semibold text-brand-text">
+                {existingApp.field}
+              </span>
+              . Switching will update your existing application to{" "}
+              <span className="font-semibold text-brand-text">
+                {formData.field}
+              </span>
+              .
             </p>
             <div className="mt-6 flex gap-3">
               <button
@@ -284,7 +301,7 @@ function ApplyForm() {
                 disabled={loading}
                 className="flex-1 rounded-lg bg-brand-accent px-4 py-2.5 text-sm font-bold text-brand-bg transition-all hover:opacity-90 disabled:opacity-50"
               >
-                {loading ? 'Updating...' : 'Switch Track'}
+                {loading ? "Updating..." : "Switch Track"}
               </button>
             </div>
           </div>
@@ -299,7 +316,10 @@ function ApplyForm() {
             </p>
             <ul className="space-y-3">
               {PERKS.map((p) => (
-                <li key={p.text} className="flex items-center gap-3 text-sm text-brand-text">
+                <li
+                  key={p.text}
+                  className="flex items-center gap-3 text-sm text-brand-text"
+                >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-accent/10 text-brand-accent">
                     <i className={p.icon} aria-hidden="true"></i>
                   </span>
@@ -309,20 +329,31 @@ function ApplyForm() {
             </ul>
           </div>
           <div className="rounded-2xl border border-brand-border bg-brand-card p-6 text-sm leading-relaxed text-brand-muted">
-            <i className="fa-solid fa-circle-info mr-2 text-brand-gold" aria-hidden="true"></i>
-            Not sure which track fits?{' '}
-            <Link href="/tracks" className="font-semibold text-brand-accent hover:underline">
+            <i
+              className="fa-solid fa-circle-info mr-2 text-brand-gold"
+              aria-hidden="true"
+            ></i>
+            Not sure which track fits?{" "}
+            <Link
+              href="/tracks"
+              className="font-semibold text-brand-accent hover:underline"
+            >
               Compare all tracks
-            </Link>{' '}
+            </Link>{" "}
             before you apply.
           </div>
 
           {/* Signed-in notice */}
           <div className="rounded-2xl border border-brand-accent/20 bg-brand-accent/5 p-4 text-sm text-brand-muted">
-            <i className="fa-solid fa-user-check mr-2 text-brand-accent" aria-hidden="true" />
-            Signed in as{' '}
-            <span className="font-semibold text-brand-text">{session?.user?.email}</span>. Name
-            and email are locked to your account.
+            <i
+              className="fa-solid fa-user-check mr-2 text-brand-accent"
+              aria-hidden="true"
+            />
+            Signed in as{" "}
+            <span className="font-semibold text-brand-text">
+              {session?.user?.email}
+            </span>
+            . Name and email are locked to your account.
           </div>
         </aside>
 
@@ -336,10 +367,16 @@ function ApplyForm() {
                 You&apos;re already in!
               </h2>
               <p className="mt-2 max-w-sm text-sm text-brand-muted">
-                Your application for{' '}
-                <span className="font-semibold text-brand-text">{approvedApp.field}</span> has been{' '}
-                <span className="text-brand-accent font-semibold">approved</span> in the current cohort.
-                You can apply again when a new cohort opens.
+                Your application for{" "}
+                <span className="font-semibold text-brand-text">
+                  {approvedApp.field}
+                </span>{" "}
+                has been{" "}
+                <span className="text-brand-accent font-semibold">
+                  approved
+                </span>{" "}
+                in the current cohort. You can apply again when a new cohort
+                opens.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -365,16 +402,26 @@ function ApplyForm() {
                 You&apos;re in the stream!
               </h2>
               <p className="mt-2 max-w-sm text-sm text-brand-muted">
-                Thanks {formData.fullName || 'there'} — your application for{' '}
-                <span className="text-brand-text">{formData.field || 'the cohort'}</span> has been
-                received. We&apos;ll reach out at{' '}
+                Thanks {formData.fullName || "there"} — your application for{" "}
+                <span className="text-brand-text">
+                  {formData.field || "the cohort"}
+                </span>{" "}
+                has been received. We&apos;ll reach out at{" "}
                 <span className="text-brand-text">{formData.email}</span>.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => {
-                    setSubmitted(false)
-                    setFormData((prev) => ({ ...prev, phone: '', education: '', skills: '', field: '', linkedinProfile: '', coverNote: '' }))
+                    setSubmitted(false);
+                    setFormData((prev) => ({
+                      ...prev,
+                      phone: "",
+                      education: "",
+                      skills: "",
+                      field: "",
+                      linkedinProfile: "",
+                      coverNote: "",
+                    }));
                   }}
                   className="rounded-lg border border-brand-border bg-brand-card px-5 py-2.5 text-sm font-medium text-brand-text transition-colors hover:border-brand-accent"
                 >
@@ -392,28 +439,43 @@ function ApplyForm() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-brand-muted">
-                    Full Name{' '}
-                    <span className="ml-1 rounded bg-brand-card px-1.5 py-0.5 text-xs text-brand-muted">
-                      <i className="fa-solid fa-lock mr-1 text-[10px]" aria-hidden="true" />
-                      locked
-                    </span>
+                  <label
+                    htmlFor="fullName"
+                    className="mb-2 block text-sm font-medium text-brand-muted"
+                  >
+                    Full Name <span className="text-red-400">*</span>
                   </label>
                   <input
                     id="fullName"
                     type="text"
+                    required
                     name="fullName"
                     value={formData.fullName}
-                    readOnly
-                    tabIndex={-1}
-                    className={lockedInputClass}
+                    onChange={handleChange}
+                    placeholder="Your full name as you want it on your certificate"
+                    maxLength={50} // Prevents paragraphs
+                    pattern="[A-Za-z ]+" // Only letters and spaces
+                    className={inputClass}
                   />
+                  <p className="mt-1 text-xs text-brand-muted">
+                    <i
+                      className="fa-solid fa-circle-info mr-1 text-brand-gold"
+                      aria-hidden="true"
+                    />
+                    This will appear on your certificate. Use your legal name.
+                  </p>
                 </div>
                 <div>
-                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-brand-muted">
-                    Email Address{' '}
+                  <label
+                    htmlFor="email"
+                    className="mb-2 block text-sm font-medium text-brand-muted"
+                  >
+                    Email Address{" "}
                     <span className="ml-1 rounded bg-brand-card px-1.5 py-0.5 text-xs text-brand-muted">
-                      <i className="fa-solid fa-lock mr-1 text-[10px]" aria-hidden="true" />
+                      <i
+                        className="fa-solid fa-lock mr-1 text-[10px]"
+                        aria-hidden="true"
+                      />
                       locked
                     </span>
                   </label>
@@ -431,23 +493,37 @@ function ApplyForm() {
 
               <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <label htmlFor="phone" className="mb-2 block text-sm font-medium text-brand-muted">
+                  <label
+                    htmlFor="phone"
+                    className="mb-2 block text-sm font-medium text-brand-muted"
+                  >
                     Phone <span className="text-red-400">*</span>
                   </label>
                   <input
-                    id="phone" type="tel" required
-                    name="phone" value={formData.phone} onChange={handleChange}
+                    id="phone"
+                    type="tel"
+                    required
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     placeholder="+92 300 1234567"
                     className={inputClass}
                   />
                 </div>
                 <div>
-                  <label htmlFor="education" className="mb-2 block text-sm font-medium text-brand-muted">
+                  <label
+                    htmlFor="education"
+                    className="mb-2 block text-sm font-medium text-brand-muted"
+                  >
                     Education <span className="text-red-400">*</span>
                   </label>
                   <input
-                    id="education" type="text" required
-                    name="education" value={formData.education} onChange={handleChange}
+                    id="education"
+                    type="text"
+                    required
+                    name="education"
+                    value={formData.education}
+                    onChange={handleChange}
                     placeholder="BSc CS — FAST-NUCES, 2026"
                     className={inputClass}
                   />
@@ -455,53 +531,84 @@ function ApplyForm() {
               </div>
 
               <div>
-                <label htmlFor="skills" className="mb-2 block text-sm font-medium text-brand-muted">
+                <label
+                  htmlFor="skills"
+                  className="mb-2 block text-sm font-medium text-brand-muted"
+                >
                   Skills
                 </label>
                 <input
-                  id="skills" type="text"
-                  name="skills" value={formData.skills} onChange={handleChange}
+                  id="skills"
+                  type="text"
+                  name="skills"
+                  value={formData.skills}
+                  onChange={handleChange}
                   placeholder="React, Python, Figma (comma-separated)"
                   className={inputClass}
                 />
               </div>
 
               <div>
-                <label htmlFor="field" className="mb-2 block text-sm font-medium text-brand-muted">
+                <label
+                  htmlFor="field"
+                  className="mb-2 block text-sm font-medium text-brand-muted"
+                >
                   Choose Your Track <span className="text-red-400">*</span>
                 </label>
                 <select
-                  id="field" required
-                  name="field" value={formData.field} onChange={handleChange}
+                  id="field"
+                  required
+                  name="field"
+                  value={formData.field}
+                  onChange={handleChange}
                   className={inputClass}
                 >
-                  <option value="" disabled>Select a track...</option>
+                  <option value="" disabled>
+                    Select a track...
+                  </option>
                   {TRACKS.map((t) => (
-                    <option key={t.id} value={t.title}>{t.title}</option>
+                    <option key={t.id} value={t.title}>
+                      {t.title}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label htmlFor="linkedinProfile" className="mb-2 block text-sm font-medium text-brand-muted">
+                <label
+                  htmlFor="linkedinProfile"
+                  className="mb-2 block text-sm font-medium text-brand-muted"
+                >
                   LinkedIn Profile <span className="text-red-400">*</span>
                 </label>
                 <input
-                  id="linkedinProfile" type="url" required
-                  name="linkedinProfile" value={formData.linkedinProfile} onChange={handleChange}
+                  id="linkedinProfile"
+                  type="url"
+                  required
+                  name="linkedinProfile"
+                  value={formData.linkedinProfile}
+                  onChange={handleChange}
                   placeholder="https://www.linkedin.com/in/yourprofile"
                   className={inputClass}
                 />
               </div>
 
               <div>
-                <label htmlFor="coverNote" className="mb-2 block text-sm font-medium text-brand-muted">
-                  Why this track?{' '}
-                  <span className="text-xs text-brand-muted/50">(optional)</span>
+                <label
+                  htmlFor="coverNote"
+                  className="mb-2 block text-sm font-medium text-brand-muted"
+                >
+                  Why this track?{" "}
+                  <span className="text-xs text-brand-muted/50">
+                    (optional)
+                  </span>
                 </label>
                 <textarea
-                  id="coverNote" rows={3}
-                  name="coverNote" value={formData.coverNote} onChange={handleChange}
+                  id="coverNote"
+                  rows={3}
+                  name="coverNote"
+                  value={formData.coverNote}
+                  onChange={handleChange}
                   placeholder="A short note on why you're interested and what you hope to build..."
                   className={`${inputClass} resize-none`}
                 />
@@ -509,7 +616,10 @@ function ApplyForm() {
 
               {error && (
                 <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
-                  <i className="fa-solid fa-circle-xmark mr-2" aria-hidden="true" />
+                  <i
+                    className="fa-solid fa-circle-xmark mr-2"
+                    aria-hidden="true"
+                  />
                   {error}
                 </div>
               )}
@@ -520,16 +630,19 @@ function ApplyForm() {
                 className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-brand-accent px-4 py-3 font-bold text-brand-bg transition-all hover:opacity-90 disabled:opacity-50"
               >
                 {loading ? (
-                  <i className="fa-solid fa-spinner fa-spin" aria-hidden="true" />
+                  <i
+                    className="fa-solid fa-spinner fa-spin"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <i className="fa-solid fa-bolt" aria-hidden="true" />
                 )}
-                {loading ? 'Submitting...' : 'Join the Cohort'}
+                {loading ? "Submitting..." : "Join the Cohort"}
               </button>
             </form>
           )}
         </div>
       </section>
     </>
-  )
+  );
 }

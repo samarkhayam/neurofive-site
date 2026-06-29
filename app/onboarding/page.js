@@ -14,20 +14,18 @@ export default function OnboardingPage() {
   const [syncing, setSyncing] = useState(true)
   const [error, setError] = useState('')
 
-  // Sync Google user into Supabase on first load
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login')
       return
     }
     if (status === 'authenticated') {
-      // Call sync-user to upsert into users table
       fetch('/api/auth/sync-user', { method: 'POST' })
         .then((r) => r.json())
         .then(({ user }) => {
-          // If they already have a full_name, skip onboarding
+          // If user already has a name → skip onboarding → go to /apply
           if (user?.full_name) {
-            router.replace('/dashboard')
+            router.replace('/apply')
           } else {
             setSyncing(false)
           }
@@ -53,7 +51,8 @@ export default function OnboardingPage() {
       return
     }
 
-    router.push('/dashboard')
+    // Redirect to apply page after saving name
+    router.push('/apply')
   }
 
   if (status === 'loading' || syncing) {
@@ -90,6 +89,9 @@ export default function OnboardingPage() {
               Enter your full name exactly as you&apos;d like it to appear on your{' '}
               <span className="font-medium text-brand-text">certificate</span>.
             </p>
+            <p className="mt-1 text-xs text-brand-muted/70">
+              You can also change this later on the application page.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -104,12 +106,13 @@ export default function OnboardingPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Muhammad Ali Khan"
+                maxLength={50}
                 autoFocus
                 className="w-full rounded-lg border border-brand-border bg-brand-card px-4 py-2.5 text-brand-text placeholder:text-brand-muted/50 focus:outline-none focus:ring-2 focus:ring-brand-accent"
               />
               <p className="mt-1.5 text-xs text-brand-muted">
                 <i className="fa-solid fa-circle-info mr-1 text-brand-gold" aria-hidden="true" />
-                This will be printed on your certificate and cannot be changed later.
+                This will be printed on your certificate.
               </p>
             </div>
 
@@ -130,7 +133,7 @@ export default function OnboardingPage() {
               ) : (
                 <i className="fa-solid fa-arrow-right" aria-hidden="true" />
               )}
-              {loading ? 'Saving...' : 'Go to Dashboard'}
+              {loading ? 'Saving...' : 'Continue to Application'}
             </button>
           </form>
         </div>

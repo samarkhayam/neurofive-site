@@ -27,7 +27,7 @@ function NavbarContent() {
   useEffect(() => {
     setIsOpen(false)
     setUserMenuOpen(false)
-  }, [pathname])
+  }, [pathname, searchParams])
 
   useEffect(() => {
     const handler = (e) => {

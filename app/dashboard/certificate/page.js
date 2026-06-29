@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { getInterneesByEmail, getTaskStats, getCohortById } from '@/lib/data'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -11,22 +12,20 @@ export default async function CertificatePage({ searchParams }) {
 
   const { cohort: cohortParam } = await searchParams
 
-  const { data: internees } = await supabase
-    .from('internees')
-    .select('id, full_name, field, cohort_id, cert_id, start_date, end_date, grade, cert_paid')
-    .eq('email', session.user.email)
-    .order('created_at', { ascending: false })
-
+  const internees = await getInterneesByEmail(session.user.email)
   if (!internees || internees.length === 0) redirect('/dashboard')
   const internee = internees.find((i) => i.id === cohortParam) || internees[0]
   if (!internee) redirect('/dashboard')
+  // Fetch full internee data for cert-specific fields
+  const { data: interneeDetail } = await supabase
+    .from('internees')
+    .select('cert_id, grade, cert_paid, full_name, field, cohort_id, start_date, end_date')
+    .eq('id', internee.id)
+    .single()
+  Object.assign(internee, interneeDetail || {})
 
-  const { data: taskRows } = await supabase
-    .from('internee_tasks')
-    .select('status')
-    .eq('internee_id', internee.id)
-
-  const tasks = taskRows || []
+  const taskRows = await getTaskStats(internee.id)
+  const tasks = taskRows
   const total = tasks.length
   const approved = tasks.filter((t) => t.status === 'approved').length
   const allApproved = total > 0 && approved === total && internee.cert_paid === true
@@ -37,11 +36,7 @@ export default async function CertificatePage({ searchParams }) {
   // Fetch cohort name
   let cohortName = null
   if (internee.cohort_id) {
-    const { data: cohort } = await supabase
-      .from('cohorts')
-      .select('name')
-      .eq('id', internee.cohort_id)
-      .single()
+    const cohort = await getCohortById(internee.cohort_id)
     cohortName = cohort?.name
   }
 

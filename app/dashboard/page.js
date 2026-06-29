@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { getInterneesByEmail, getCohortById, getTaskStats } from '@/lib/data'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -12,37 +12,16 @@ export default async function DashboardPage({ searchParams }) {
   const { cohort: cohortParam } = await searchParams
 
   // Get all internees for this user
-  const { data: internees } = await supabase
-    .from('internees')
-    .select('id, full_name, field, status, start_date, end_date, cohort_id, cert_paid')
-    .eq('email', session.user.email)
-    .order('created_at', { ascending: false })
-
+  const internees = await getInterneesByEmail(session.user.email)
   if (!internees || internees.length === 0) redirect('/login')
 
-  // Pick active internee from param or default to first
   const internee = internees.find((i) => i.id === cohortParam) || internees[0]
-
-  // Fetch cohort info
-  let cohort = null
-  if (internee.cohort_id) {
-    const { data } = await supabase
-      .from('cohorts')
-      .select('id, name, is_active')
-      .eq('id', internee.cohort_id)
-      .single()
-    cohort = data
-  }
+  const cohort = internee.cohort_id ? await getCohortById(internee.cohort_id) : null
 
   const isActiveCohort = cohort?.is_active ?? true
 
-  // Fetch task stats
-  const { data: taskRows } = await supabase
-    .from('internee_tasks')
-    .select('status')
-    .eq('internee_id', internee.id)
-
-  const tasks = taskRows || []
+  const taskRows = await getTaskStats(internee.id)
+  const tasks = taskRows
   const total = tasks.length
   const approved = tasks.filter((t) => t.status === 'approved').length
   const submitted = tasks.filter((t) => t.status === 'submitted').length

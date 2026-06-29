@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { getInterneesByEmail, getCohortById } from '@/lib/data'
 import { redirect } from 'next/navigation'
 import DashboardNav from '@/components/DashboardNav'
 
@@ -9,12 +10,7 @@ export default async function DashboardLayout({ children }) {
   const session = await auth()
   if (!session) redirect('/login')
 
-  // Fetch ALL internee records for this user (one per cohort)
-  const { data: internees } = await supabase
-    .from('internees')
-    .select('id, full_name, field, status, internee_id, cohort_id, cert_paid, start_date, end_date')
-    .eq('email', session.user.email)
-    .order('created_at', { ascending: false })
+  const internees = await getInterneesByEmail(session.user.email)
 
   if (!internees || internees.length === 0) {
     return (
@@ -48,21 +44,13 @@ export default async function DashboardLayout({ children }) {
     )
   }
 
-  // Fetch cohort names for all internee records
+  // Fetch cohort info for each internee (cached)
   const cohortIds = [...new Set(internees.map((i) => i.cohort_id).filter(Boolean))]
-  let cohorts = []
-  if (cohortIds.length > 0) {
-    const { data } = await supabase
-      .from('cohorts')
-      .select('id, name, is_active')
-      .in('id', cohortIds)
-    cohorts = data || []
-  }
-
-  // Attach cohort info to each internee
+  const cohorts = await Promise.all(cohortIds.map(id => getCohortById(id)))
+  const cohortMap = Object.fromEntries(cohorts.filter(Boolean).map(c => [c.id, c]))
   const interneesWithCohort = internees.map((i) => ({
     ...i,
-    cohort: cohorts.find((c) => c.id === i.cohort_id) || null,
+    cohort: cohortMap[i.cohort_id] || null,
   }))
 
   return (

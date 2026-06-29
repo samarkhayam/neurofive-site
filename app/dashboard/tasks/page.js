@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { getInterneesByEmail, getTaskStats } from '@/lib/data'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -27,40 +27,14 @@ export default async function TasksPage({ searchParams }) {
 
   const { cohort: cohortParam } = await searchParams
 
-  const { data: internees } = await supabase
-    .from('internees')
-    .select('id, start_date')
-    .eq('email', session.user.email)
-    .order('created_at', { ascending: false })
-
+  const internees = await getInterneesByEmail(session.user.email)
   if (!internees || internees.length === 0) redirect('/dashboard')
   const internee = internees.find((i) => i.id === cohortParam) || internees[0]
   if (!internee) redirect('/dashboard')
 
   const unlockedWeeks = getUnlockedWeeks(internee.start_date)
 
-  const { data: internee_tasks } = await supabase
-    .from('internee_tasks')
-    .select(`
-      id,
-      status,
-      submission_url,
-      submitted_at,
-      reviewed_at,
-      feedback,
-      tasks (
-        id,
-        title,
-        description,
-        week_number,
-        order_index,
-        track
-      )
-    `)
-    .eq('internee_id', internee.id)
-    .order('created_at', { ascending: true })
-
-  const rows = internee_tasks || []
+  const rows = await getTaskStats(internee.id)
 
   // Group by week
   const byWeek = rows.reduce((acc, row) => {

@@ -161,7 +161,7 @@ export default function CertificatePage() {
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold text-brand-text">Certificate</h1>
         <p className="mt-1 text-sm text-brand-muted">
-          {selectedInterneo.cohorts?.name || 'Cohort'} — {selectedInternee.field}
+          {selectedInternee.cohorts?.name || 'Cohort'} — {selectedInternee.field}
         </p>
       </div>
 

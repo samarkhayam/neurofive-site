@@ -3,8 +3,8 @@ import Link from 'next/link'
 const NAV = [
   { href: '/about', label: 'About', icon: 'fa-regular fa-address-card' },
   { href: '/tracks', label: 'Tracks', icon: 'fa-solid fa-code-branch' },
-  { href: '/get-certificate', label: 'Get Certificate', icon: 'fa-solid fa-certificate' },
-  { href: '/verify-certificate', label: 'Verify', icon: 'fa-regular fa-circle-check' },
+  // { href: '/get-certificate', label: 'Get Certificate', icon: 'fa-solid fa-certificate' },
+  { href: '/verify-certificate', label: 'Verify Certificate', icon: 'fa-regular fa-circle-check' },
   { href: '/faq', label: 'FAQ', icon: 'fa-regular fa-circle-question' },
   { href: '/contact', label: 'Contact', icon: 'fa-regular fa-envelope' },
 ]

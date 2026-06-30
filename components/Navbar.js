@@ -21,7 +21,8 @@ function NavbarContent() {
   const [internees, setInternees] = useState([])
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { data: session } = useSession()
+  const { data: session, status: sessionStatus } = useSession()
+  const sessionLoading = sessionStatus === 'loading'
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -152,7 +153,9 @@ function NavbarContent() {
 
           {/* Desktop right — user menu or sign in */}
           <div className="hidden items-center gap-3 md:flex">
-            {session ? (
+            {sessionLoading ? (
+              <div className="h-9 w-32 rounded-lg bg-brand-card animate-pulse" />
+            ) : session ? (
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -241,7 +244,10 @@ function NavbarContent() {
 
           {/* Mobile toggle */}
           <div className="flex items-center gap-3 md:hidden">
-            {session?.user?.image && (
+            {sessionLoading && (
+              <div className="h-7 w-7 rounded-full bg-brand-card animate-pulse" />
+            )}
+            {!sessionLoading && session?.user?.image && (
               <img src={session.user.image} alt={displayName} className="h-7 w-7 rounded-full object-cover border border-brand-border" />
             )}
             <button
@@ -293,7 +299,9 @@ function NavbarContent() {
           )}
 
           <div className="mt-3 border-t border-brand-border pt-3 space-y-1">
-            {session ? (
+            {sessionLoading ? (
+              <div className="h-12 rounded-lg bg-brand-card animate-pulse" />
+            ) : session ? (
               <>
                 <div className="flex items-center gap-3 rounded-lg bg-brand-card px-4 py-3 mb-2">
                   {session.user.image ? (

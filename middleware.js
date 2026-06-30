@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 
-const PUBLIC_PATHS = ['/', '/login', '/about', '/tracks', '/contact']
+// Only these path prefixes require login — everything else is public by default
+const PROTECTED_PREFIXES = ['/dashboard', '/apply']
 
 export default auth(async (req) => {
   const { pathname } = req.nextUrl
@@ -15,19 +16,17 @@ export default auth(async (req) => {
     return NextResponse.next()
   }
 
-  const isPublic = PUBLIC_PATHS.includes(pathname)
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
 
-  // If auth wrapper failed (no AUTH_SECRET etc), don't block public pages
   let session = null
   try {
     session = req.auth
   } catch {
-    if (isPublic) return NextResponse.next()
+    if (!isProtected) return NextResponse.next()
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // Not signed in — only block protected routes
-  if (!session && !isPublic) {
+  if (!session && isProtected) {
     const loginUrl = new URL('/login', req.url)
     loginUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(loginUrl)

@@ -502,7 +502,7 @@ function ApplyForm() {
                   <input
                     id="phone"
                     type="tel"
-                    required
+                    
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}

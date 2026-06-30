@@ -4,7 +4,7 @@ import Footer from '@/components/Footer'
 import SessionWrapper from '@/components/SessionWrapper'
 
 export const metadata = {
-  metadataBase: new URL("https://neurofivesolutions.site"),
+  metadataBase: new URL("https://neurofivesolutions.com"),
   title: {
     default: "NeuroFive Solutions — Build the stack, ship to real users",
     template: "%s | NeuroFive Solutions",
@@ -51,7 +51,7 @@ export const metadata = {
   },
 
   alternates: {
-    canonical: "https://neurofivesolutions.site",
+    canonical: "https://neurofivesolutions.com",
   },
   verification: {
     google: 'frqgkQEWBtBri7OEe97KYuPAOZW07D8gWcDrGIDBFqk', // just the content value, not the whole tag
@@ -81,6 +81,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
+        <meta name="google-site-verification" content="g21wwQzXqFP2bLNmyUIjf549dEYFKumNLgE4sbyT7H4" />
       </head>
       <body suppressHydrationWarning className="flex min-h-screen flex-col bg-brand-bg font-sans text-brand-text antialiased">
         <SessionWrapper>

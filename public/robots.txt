@@ -4,4 +4,4 @@ Disallow: /dashboard
 Disallow: /onboarding
 Disallow: /api
 
-Sitemap: https://neurofivesolutions.site/sitemap.xml
+Sitemap: https://neurofivesolutions.com/sitemap.xml

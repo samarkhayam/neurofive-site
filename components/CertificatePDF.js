@@ -16,9 +16,9 @@ Font.register({
   src: 'Helvetica',
 })
 
-// A4 Landscape: 841.89 x 595.28 pt
-const W = 841.89
-const H = 595.28
+// A4 Landscape dimensions in points
+const W = 842
+const H = 595
 
 const C = {
   black:      '#000000',
@@ -233,10 +233,10 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   bodyText: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: C.muted,
-    lineHeight: 1.7,
-    maxWidth: 460,
+    lineHeight: 1.6,
+    maxWidth: 420,
   },
   trackHighlight: {
     color: C.white,
@@ -246,17 +246,20 @@ const styles = StyleSheet.create({
   // Bottom details row
   bottomRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     borderTop: `0.5pt solid ${C.borderDim}`,
-    paddingTop: 16,
+    paddingTop: 14,
+    marginTop: 10,
   },
   detailsGroup: {
     flexDirection: 'row',
-    gap: 32,
+    gap: 28,
+    flexShrink: 1,
   },
   detailItem: {
-    minWidth: 90,
+    minWidth: 80,
+    maxWidth: 110,
   },
   detailLabel: {
     fontSize: 7,
@@ -266,13 +269,13 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   detailValue: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontFamily: 'Helvetica-Bold',
     color: C.white,
     letterSpacing: 0.3,
   },
   gradeValue: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontFamily: 'Helvetica-Bold',
     color: C.gold,
     letterSpacing: 0.3,
@@ -281,25 +284,30 @@ const styles = StyleSheet.create({
   // Verify link block
   verifyBlock: {
     alignItems: 'flex-end',
+    flexShrink: 0,
+    maxWidth: 200,
   },
   verifyLabel: {
-    fontSize: 7,
+    fontSize: 6.5,
     color: C.mutedDark,
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginBottom: 3,
+    textAlign: 'right',
   },
   verifyUrl: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: C.accent,
     fontFamily: 'Helvetica-Bold',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
+    textAlign: 'right',
   },
   issuedBy: {
-    fontSize: 7,
+    fontSize: 6.5,
     color: C.mutedDark,
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
     marginTop: 4,
+    textAlign: 'right',
   },
 })
 
@@ -334,7 +342,7 @@ export function CertificatePDF({ data }) {
 
   return (
     <Document>
-      <Page size={[W, H]} orientation="landscape" style={styles.page}>
+      <Page size="A4" orientation="landscape" style={styles.page}>
 
         {/* ── Borders & corners ── */}
         <View style={styles.frameBorder} />
@@ -425,8 +433,9 @@ export function CertificatePDF({ data }) {
 
             <View style={styles.verifyBlock}>
               <Text style={styles.verifyLabel}>Verify this certificate</Text>
-              <Text style={styles.verifyUrl}>neurofivesolutions.com/verify-certificate</Text>
-              <Text style={styles.issuedBy}>Issued by NeuroFive Solutions · {displayId}</Text>
+              <Text style={styles.verifyUrl}>neurofivesolutions.com</Text>
+              <Text style={styles.verifyUrl}>/verify-certificate</Text>
+              <Text style={styles.issuedBy}>{displayId}</Text>
             </View>
           </View>
 

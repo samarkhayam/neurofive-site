@@ -65,7 +65,7 @@ export default function Footer() {
                 <i className="fa-brands fa-linkedin-in" aria-hidden="true"></i>
               </a>
               <a
-                href="https://www.instagram.com/neurofive_solutions1?igsh=Z25ldTVwazJrdnNv"
+                href="https://www.instagram.com/neurofive_solutions?igsh=Z25ldTVwazJrdnNv"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"

@@ -200,29 +200,16 @@ function ApplyForm() {
       return
     }
 
-    const { data: sameField } = await supabase
-      .from('applications')
-      .select('id, field')
-      .eq('email', formData.email)
-      .eq('field', formData.field)
-      .eq('cohort_id', cohortData.id)
-
-    if (sameField && sameField.length > 0) {
-      setLoading(false)
-      setPopup('duplicate')
-      return
-    }
-
-    const { data: diffField } = await supabase
+    const { data: existing } = await supabase
       .from('applications')
       .select('id, field')
       .eq('email', formData.email)
       .eq('cohort_id', cohortData.id)
 
-    if (diffField && diffField.length > 0) {
-      setExistingApp({ id: diffField[0].id, field: diffField[0].field, cohortId: cohortData.id })
+    if (existing && existing.length > 0) {
+      setExistingApp({ id: existing[0].id, field: existing[0].field, cohortId: cohortData.id })
       setLoading(false)
-      setPopup('switch')
+      setPopup(existing[0].field === formData.field ? 'update' : 'switch')
       return
     }
 
@@ -248,32 +235,42 @@ function ApplyForm() {
         subtitle="Join our next internship cohort. Share your background, choose your learning track, and take the first step toward real-world experience."
       />
 
-      {/* Duplicate popup */}
-      {popup === "duplicate" && (
+      {/* Update popup (resubmitting with same track) */}
+      {popup === "update" && existingApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
           <div className="w-full max-w-md rounded-2xl border border-brand-border bg-brand-surface p-8 shadow-xl">
-            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400">
+            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent/10 text-brand-accent">
               <i
-                className="fa-solid fa-triangle-exclamation text-xl"
+                className="fa-solid fa-pen-to-square text-xl"
                 aria-hidden="true"
               />
             </div>
             <h2 className="font-display text-lg font-bold text-brand-text">
-              Already applied
+              Update your application?
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-brand-muted">
               You&apos;ve already applied for{" "}
               <span className="font-semibold text-brand-text">
-                {formData.field}
-              </span>{" "}
-              in the current cohort. Only one application per field is allowed.
+                {existingApp.field}
+              </span>
+              . Submitting again will update your existing application with
+              these new details.
             </p>
-            <button
-              onClick={() => setPopup(null)}
-              className="mt-6 w-full rounded-lg bg-brand-accent px-4 py-2.5 text-sm font-bold text-brand-bg transition-all hover:opacity-90"
-            >
-              Got it
-            </button>
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setPopup(null)}
+                className="flex-1 rounded-lg border border-brand-border bg-brand-card px-4 py-2.5 text-sm font-medium text-brand-text transition-colors hover:border-brand-accent"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSwitch}
+                disabled={loading}
+                className="flex-1 rounded-lg bg-brand-accent px-4 py-2.5 text-sm font-bold text-brand-bg transition-all hover:opacity-90 disabled:opacity-50"
+              >
+                {loading ? "Updating..." : "Update Application"}
+              </button>
+            </div>
           </div>
         </div>
       )}

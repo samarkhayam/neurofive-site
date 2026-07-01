@@ -8,14 +8,8 @@ import PageHeader from '@/components/PageHeader'
 import { TRACKS } from '@/data/tracks'
 import { supabase } from '@/lib/supabase'
 
-const WHATSAPP_LINK = 'https://chat.whatsapp.com/HkUIbK1OqEYL7btJYZSlbl';
-const LINKEDIN_LINK = 'https://www.linkedin.com/company/neurofivesolutions';
-
-// const PERKS = [
-//   { icon: 'fa-solid fa-clock', text: 'Under 60 seconds' },
-//   { icon: 'fa-solid fa-file-circle-xmark', text: 'No resume required' },
-//   { icon: 'fa-solid fa-shield-halved', text: 'Pre-filled from your account' },
-// ]
+const WHATSAPP_LINK = 'https://chat.whatsapp.com/Jgq6Cv3S1m3DyS4ArOfEXo'
+const LINKEDIN_LINK = 'https://www.linkedin.com/company/neurofive' 
 
 export default function Apply() {
   return (
@@ -41,6 +35,8 @@ function ApplyForm() {
     field: '',
     linkedinProfile: '',
     coverNote: '',
+    location: '',
+    university: '',
   })
   const [whatsappJoined, setWhatsappJoined] = useState(false)
   const [linkedinJoined, setLinkedinJoined] = useState(false)
@@ -128,6 +124,8 @@ function ApplyForm() {
       field: formData.field,
       linkedin_profile: formData.linkedinProfile,
       cover_note: formData.coverNote,
+      location: formData.location,
+      university: formData.university,
       cohort_id: cohortId,
       status: 'pending',
     })
@@ -145,6 +143,8 @@ function ApplyForm() {
         skills: formData.skills,
         linkedin_profile: formData.linkedinProfile,
         cover_note: formData.coverNote,
+        location: formData.location,
+        university: formData.university,
         updated_at: new Date().toISOString(),
       })
       .eq('id', appId)
@@ -306,22 +306,6 @@ function ApplyForm() {
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_2fr] lg:px-8 lg:py-20">
         <aside className="space-y-6">
-          {/* <div className="rounded-2xl border border-brand-border bg-brand-surface p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand-muted">
-              Why apply here
-            </p>
-            <ul className="space-y-3">
-              {PERKS.map((p) => (
-                <li key={p.text} className="flex items-center gap-3 text-sm text-brand-text">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-accent/10 text-brand-accent">
-                    <i className={p.icon} aria-hidden="true" />
-                  </span>
-                  {p.text}
-                </li>
-              ))}
-            </ul>
-          </div> */}
-
           {/* WhatsApp CTA */}
           <a
             href={WHATSAPP_LINK}
@@ -428,6 +412,8 @@ function ApplyForm() {
                       field: '',
                       linkedinProfile: '',
                       coverNote: '',
+                      location: '',
+                      university: '',
                     }))
                   }}
                   className="rounded-lg border border-brand-border bg-brand-card px-5 py-2.5 text-sm font-medium text-brand-text transition-colors hover:border-brand-accent"
@@ -489,11 +475,12 @@ function ApplyForm() {
               <div className="grid gap-6 md:grid-cols-2">
                 <div>
                   <label htmlFor="phone" className="mb-2 block text-sm font-medium text-brand-muted">
-                    Phone
+                    Phone <span className="text-red-400">*</span>
                   </label>
                   <input
                     id="phone"
                     type="tel"
+                    required
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
@@ -501,6 +488,24 @@ function ApplyForm() {
                     className={inputClass}
                   />
                 </div>
+                <div>
+                  <label htmlFor="location" className="mb-2 block text-sm font-medium text-brand-muted">
+                    Location <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    id="location"
+                    type="text"
+                    required
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="Karachi, Pakistan"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
                   <label htmlFor="education" className="mb-2 block text-sm font-medium text-brand-muted">
                     Education <span className="text-red-400">*</span>
@@ -516,15 +521,31 @@ function ApplyForm() {
                     className={inputClass}
                   />
                 </div>
+                <div>
+                  <label htmlFor="university" className="mb-2 block text-sm font-medium text-brand-muted">
+                    University/Institution <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    id="university"
+                    type="text"
+                    required
+                    name="university"
+                    value={formData.university}
+                    onChange={handleChange}
+                    placeholder="FAST-NUCES, Karachi"
+                    className={inputClass}
+                  />
+                </div>
               </div>
 
               <div>
                 <label htmlFor="skills" className="mb-2 block text-sm font-medium text-brand-muted">
-                  Skills
+                  Skills <span className="text-red-400">*</span>
                 </label>
                 <input
                   id="skills"
                   type="text"
+                  required
                   name="skills"
                   value={formData.skills}
                   onChange={handleChange}
@@ -600,6 +621,7 @@ function ApplyForm() {
                     />
                   </div>
                   <label htmlFor="whatsappJoined" className="cursor-pointer text-sm text-brand-muted leading-relaxed">
+                    <span className="text-red-400">*</span>{' '}
                     I have joined the{' '}
                     <a
                       href={WHATSAPP_LINK}
@@ -610,7 +632,7 @@ function ApplyForm() {
                       <i className="fa-brands fa-whatsapp" aria-hidden="true" />
                       NeuroFive WhatsApp Community
                     </a>
-                    {' '}<span className="text-red-400">*</span>
+                    
                   </label>
                 </div>
                 {whatsappError && (
@@ -637,6 +659,7 @@ function ApplyForm() {
                     />
                   </div>
                   <label htmlFor="linkedinJoined" className="cursor-pointer text-sm text-brand-muted leading-relaxed">
+                    <span className="text-red-400">*</span>{' '}
                     I have joined the{' '}
                     <a
                       href={LINKEDIN_LINK}
@@ -647,7 +670,7 @@ function ApplyForm() {
                       <i className="fa-brands fa-linkedin" aria-hidden="true" />
                       NeuroFive LinkedIn Community
                     </a>
-                    {' '}<span className="text-red-400">*</span>
+                    
                   </label>
                 </div>
                 {linkedinError && (

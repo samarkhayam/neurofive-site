@@ -8,13 +8,14 @@ import PageHeader from '@/components/PageHeader'
 import { TRACKS } from '@/data/tracks'
 import { supabase } from '@/lib/supabase'
 
-const WHATSAPP_LINK = 'https://chat.whatsapp.com/HkUIbK1OqEYL7btJYZSlbl'
+const WHATSAPP_LINK = 'https://chat.whatsapp.com/HkUIbK1OqEYL7btJYZSlbl';
+const LINKEDIN_LINK = 'https://www.linkedin.com/company/neurofivesolutions';
 
-const PERKS = [
-  { icon: 'fa-solid fa-clock', text: 'Under 60 seconds' },
-  { icon: 'fa-solid fa-file-circle-xmark', text: 'No resume required' },
-  { icon: 'fa-solid fa-shield-halved', text: 'Pre-filled from your account' },
-]
+// const PERKS = [
+//   { icon: 'fa-solid fa-clock', text: 'Under 60 seconds' },
+//   { icon: 'fa-solid fa-file-circle-xmark', text: 'No resume required' },
+//   { icon: 'fa-solid fa-shield-halved', text: 'Pre-filled from your account' },
+// ]
 
 export default function Apply() {
   return (
@@ -42,7 +43,9 @@ function ApplyForm() {
     coverNote: '',
   })
   const [whatsappJoined, setWhatsappJoined] = useState(false)
+  const [linkedinJoined, setLinkedinJoined] = useState(false)
   const [whatsappError, setWhatsappError] = useState('')
+  const [linkedinError, setLinkedinError] = useState('')
   const [popup, setPopup] = useState(null)
   const [existingApp, setExistingApp] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -176,6 +179,12 @@ function ApplyForm() {
       return
     }
 
+    // Validate LinkedIn join
+    if (!linkedinJoined) {
+      setLinkedinError('You must join our LinkedIn community before applying.')
+      return
+    }
+
     setError('')
     setLoading(true)
 
@@ -297,7 +306,7 @@ function ApplyForm() {
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_2fr] lg:px-8 lg:py-20">
         <aside className="space-y-6">
-          <div className="rounded-2xl border border-brand-border bg-brand-surface p-6">
+          {/* <div className="rounded-2xl border border-brand-border bg-brand-surface p-6">
             <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand-muted">
               Why apply here
             </p>
@@ -311,7 +320,7 @@ function ApplyForm() {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* WhatsApp CTA */}
           <a
@@ -325,6 +334,23 @@ function ApplyForm() {
             </span>
             <div>
               <p className="text-sm font-semibold text-brand-text">Join our WhatsApp Community</p>
+              <p className="text-xs text-brand-muted">Required before submitting your application</p>
+            </div>
+            <i className="fa-solid fa-arrow-up-right-from-square ml-auto text-xs text-brand-muted" aria-hidden="true" />
+          </a>
+
+          {/* LinkedIn CTA */}
+          <a
+            href={LINKEDIN_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 p-5 transition-colors hover:border-blue-500/50"
+          >
+            <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-xl text-blue-400">
+              <i className="fa-brands fa-linkedin" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-brand-text">Join our LinkedIn Community</p>
               <p className="text-xs text-brand-muted">Required before submitting your application</p>
             </div>
             <i className="fa-solid fa-arrow-up-right-from-square ml-auto text-xs text-brand-muted" aria-hidden="true" />
@@ -393,6 +419,7 @@ function ApplyForm() {
                   onClick={() => {
                     setSubmitted(false)
                     setWhatsappJoined(false)
+                    setLinkedinJoined(false)
                     setFormData((prev) => ({
                       ...prev,
                       phone: '',
@@ -590,6 +617,43 @@ function ApplyForm() {
                   <p className="mt-2 text-xs text-red-400 pl-7">
                     <i className="fa-solid fa-circle-xmark mr-1" aria-hidden="true" />
                     {whatsappError}
+                  </p>
+                )}
+              </div>
+
+              {/* LinkedIn community confirmation */}
+              <div className={`rounded-xl border p-4 ${linkedinError ? 'border-red-500/40 bg-red-500/5' : 'border-brand-border bg-brand-card'}`}>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 pt-0.5">
+                    <input
+                      id="linkedinJoined"
+                      type="checkbox"
+                      checked={linkedinJoined}
+                      onChange={(e) => {
+                        setLinkedinJoined(e.target.checked)
+                        if (e.target.checked) setLinkedinError('')
+                      }}
+                      className="h-4 w-4 cursor-pointer accent-brand-accent"
+                    />
+                  </div>
+                  <label htmlFor="linkedinJoined" className="cursor-pointer text-sm text-brand-muted leading-relaxed">
+                    I have joined the{' '}
+                    <a
+                      href={LINKEDIN_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-blue-400 hover:underline inline-flex items-center gap-1"
+                    >
+                      <i className="fa-brands fa-linkedin" aria-hidden="true" />
+                      NeuroFive LinkedIn Community
+                    </a>
+                    {' '}<span className="text-red-400">*</span>
+                  </label>
+                </div>
+                {linkedinError && (
+                  <p className="mt-2 text-xs text-red-400 pl-7">
+                    <i className="fa-solid fa-circle-xmark mr-1" aria-hidden="true" />
+                    {linkedinError}
                   </p>
                 )}
               </div>

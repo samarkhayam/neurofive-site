@@ -80,7 +80,7 @@ export function DownloadCertificateButton({ interneeId, children }) {
       <button
         onClick={handleDownload}
         disabled={loading}
-        className={loading ? 'opacity-50 cursor-not-allowed' : ''}
+        className={loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
       >
         {loading ? (
           <>

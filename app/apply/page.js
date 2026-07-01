@@ -543,12 +543,12 @@ function ApplyForm() {
                     htmlFor="phone"
                     className="mb-2 block text-sm font-medium text-brand-muted"
                   >
-                    Phone <span className="text-red-400">*</span>
+                    Phone 
                   </label>
                   <input
                     id="phone"
                     type="tel"
-                    required
+                    
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
